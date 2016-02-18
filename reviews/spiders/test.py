@@ -67,7 +67,7 @@ class ReviewsSpider(CrawlSpider):
             reviewitem['author_link'] = author_link
             review_date = review.xpath('div[@class="a-row"]/span[@class="a-size-base a-color-secondary review-date"]/text()').extract()
             if len(review_date):
-                reviewitem['review_date'] = review_date[0].split("on")[1].strip()
+                reviewitem['review_date'] = review_date[0].split(' ', 1)[1].strip()
             else:
                 reviewitem['review_date'] = "NULL"
 
@@ -104,4 +104,3 @@ class ReviewsSpider(CrawlSpider):
             yield reviewitem
 
         pass
-
