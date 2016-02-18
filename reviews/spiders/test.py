@@ -16,7 +16,7 @@ class ReviewsSpider(CrawlSpider):
     name = "amazon"
     handle_httpstatus_list = [404]
     download_delay = 0.1
-    allowed_domains = ["www.amazon.com"]
+    allowed_domains = ["www.amazon.com", "www.amazon.de"]
     #start_urls = (
     #    'http://www.amazon.com/product-reviews/B00M44XD0O',
     #)
