@@ -1,18 +1,7 @@
 from datetime import datetime
 import mysql.connector
+import logging
 # from reviews.items import ReviewsItem
-
-
-class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
 
 class MySQLStorePipeline(object):
 
@@ -20,7 +9,7 @@ class MySQLStorePipeline(object):
         # create an object to check whether the book has been added
         # self.ids_seen = set()
 # create a connection object to the database
-        self.conn = mysql.connector.connect(user='yourusername', password='yourpassword', database='amazon_crawl')
+        self.conn = mysql.connector.connect(user='root', password='', database='amazon')
         self.cursor = self.conn.cursor()
 
     def process_item(self, item, spider):
@@ -52,6 +41,8 @@ class MySQLStorePipeline(object):
         try:
             self.cursor.execute(insert_book, data_book)
             self.conn.commit()
-            print bcolors.OKGREEN + "success, inserted into database" + bcolors.ENDC
+            logging.debug('success, inserted into database')
+        except mysql.connector.Error as err:
+            logging.warning('mysql error: %s' % err)
         except:
-            print bcolors.FAIL + "error, not inserted" + bcolors.ENDC
+            logging.warning('error at inserting review into db')
