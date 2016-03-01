@@ -3,7 +3,7 @@ __author__ = 'Tharun'
 from reviews.items import ReviewsItem
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
-import csv
+import csv, dateparser
 
 with open('amazon_links.csv', 'rU') as file:
     rows = csv.reader(file)
@@ -31,6 +31,9 @@ class ReviewsSpider(CrawlSpider):
     # def get_largest_sum(self, x):
     #     return [k for k in x.keys() if len(x.get(k)) == max([len(n) for n in x.values()])]
 
+    def changeQuotes(self, text):
+        return text.replace('"',"'")
+
     def parse_start_url(self, response):
         review_count = ''.join(response.xpath('//span[@class="a-size-medium a-text-beside-button totalReviewCount"]/text()').extract()).strip()
         asin = response.url.split("?")[0].split('/')[-1]
@@ -45,7 +48,9 @@ class ReviewsSpider(CrawlSpider):
             else:
                 reviewitem['helpful_votes'], reviewitem['total_votes'] = 0, 0
 
-            reviewitem['title'] = ''.join(review.xpath('div[@class="a-row"]/a[@class="a-size-base a-link-normal review-title a-color-base a-text-bold"]/text()').extract()).strip()
+            title_raw = ''.join(review.xpath('div[@class="a-row"]/a[@class="a-size-base a-link-normal review-title a-color-base a-text-bold"]/text()').extract()).strip()
+
+            reviewitem['title'] = self.changeQuotes(title_raw)
 
             review_link = ''.join(review.xpath('div[@class="a-row"]/a[@class="a-size-base a-link-normal review-title '
                                                                    'a-color-base a-text-bold"]/@href').extract()).strip()
@@ -67,7 +72,12 @@ class ReviewsSpider(CrawlSpider):
             reviewitem['author_link'] = author_link
             review_date = review.xpath('div[@class="a-row"]/span[@class="a-size-base a-color-secondary review-date"]/text()').extract()
             if len(review_date):
-                reviewitem['review_date'] = review_date[0].split(' ', 1)[1].strip()
+                date_raw = review_date[0].split(' ', 1)[1].strip()
+                #print date_raw
+                #dateobj = dateparser.parse(date_raw)
+                #reviewitem['review_date'] = dateobj.isoformat()
+                reviewitem['review_date'] = date_raw
+
             else:
                 reviewitem['review_date'] = "NULL"
 
@@ -77,7 +87,9 @@ class ReviewsSpider(CrawlSpider):
             else:
                 reviewitem['verified'] = 0
 
-            reviewitem['text'] = ''.join(review.xpath('div[@class="a-row review-data"]/span/text()').extract()).strip()
+            text_raw = ''.join(review.xpath('div[@class="a-row review-data"]/span/text()').extract()).strip()
+
+            reviewitem['text'] = self.changeQuotes(text_raw)
 
             has_video = review.xpath('div[@class="a-row review-data"]/span/div[@class="a-section a-spacing-small a-spacing-top-mini '
                                      'video-block"]').extract()
