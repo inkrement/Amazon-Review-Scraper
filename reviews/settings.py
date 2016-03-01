@@ -8,9 +8,9 @@ DEFAULT_ITEM_CLASS = 'reviews.items.ReviewsItem'
 
 # If you want to pipeline the output of the spider to MySQLDb server, uncomment the following lines
 # and enter credentials of the server in reviews/pipelines.py
-# ITEM_PIPELINES = [
-#      'reviews.pipelines.MySQLStorePipeline',
-# ]
+ITEM_PIPELINES = {
+    'reviews.pipelines.MySQLStorePipeline':300
+}
 
 DOWNLOAD_HANDLERS = {
   's3': None,
